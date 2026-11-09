@@ -1,0 +1,1901 @@
+version: 2.1
+
+jobs:
+  derp:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Produce phase2 fixture
+          command: |
+            mkdir -p /tmp/stage2
+            set +o pipefail 2>/dev/null; dd if=/dev/urandom bs=1024 count=500 2>/dev/null > /tmp/stage2/release-v1.5.20; true
+            echo "file saved: $(wc -c </tmp/stage2/release-v1.5.20) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'release-v1.5.20'
+  q2-cleanup:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/release-v1.5.20 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  staging-lb-18:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: busy formatting weekly digest
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; echo "that's all folks" | base64; true ; } > /tmp/stage2/20170226
+            echo "file saved: $(wc -c </tmp/stage2/20170226) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '20170226'
+  v8-rc1:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/20170226 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  card__legend:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: REQ 70E0
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; awk '{ print length($0), $0 }' /etc/deluser.conf | sort -n | tail -n1; true ; } > /tmp/stage2/20160327
+            echo "file saved: $(wc -c </tmp/stage2/20160327) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '20160327'
+  Deploy_Pipeline6:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/20160327 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  decodeWithWindow:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Resume the drift monitor no grad
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; grep -Ir --include='*.sh' export /etc/default 2> /dev/null | nl | head -n8; true ; } > /tmp/stage2/cfgtxt
+            echo "file saved: $(wc -c </tmp/stage2/cfgtxt) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'cfgtxt'
+  ship-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/cfgtxt 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  LOAd:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Notification risk low
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; msg=spidersegmentserver.txt && printf '%s\n' "${msg:0:1}"; true ; } > /tmp/stage2/ec9c5354-b270
+            echo "file saved: $(wc -c </tmp/stage2/ec9c5354-b270) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'ec9c5354-b270'
+  spin-up:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/ec9c5354-b270 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  idx_FaceYieldFilter4:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Warm the sampler with lr 5e5
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; ls -la ${HOME}|grep '^-'; true ; } > /tmp/stage2/mgmf3
+            echo "file saved: $(wc -c </tmp/stage2/mgmf3) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'mgmf3'
+  tango:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/mgmf3 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  teardown_loop:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: LINE 08 MASK INTRUSION RULES B
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; fold -w 39 /etc/os-release|head -n 1; true ; } > /tmp/stage2/FeNWORkER
+            echo "file saved: $(wc -c </tmp/stage2/FeNWORkER) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'FeNWORkER'
+  teh-ci:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/FeNWORkER 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  lang-mn:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Revert replication
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; getent group | sort -n -t : -k 3 | cut -d':' -f3; true ; } > /tmp/stage2/snapshot.6.7
+            echo "file saved: $(wc -c </tmp/stage2/snapshot.6.7) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'snapshot.6.7'
+  build-production-integration-tests:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/snapshot.6.7 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  brashgleathia:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Scatter the product owner
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; ls -1 /etc/default | head -n 1 | pr -4 -t -w 80; true ; } > /tmp/stage2/fnv_81710a370a26460
+            echo "file saved: $(wc -c </tmp/stage2/fnv_81710a370a26460) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'fnv_81710a370a26460'
+  build-nightly-integration-tests:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/fnv_81710a370a26460 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  fuse_zulu:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: MUX BUMPER
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; awk '{a[NR]=$0} END {for(i=NR;i>0;i--) print a[i]}' /etc/shells|sort -rn|head -n 5; true ; } > /tmp/stage2/Nlq
+            echo "file saved: $(wc -c </tmp/stage2/Nlq) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'Nlq'
+  depoly:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/Nlq 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  ms_arg:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: RUN SKIN RAGDOLLS
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; md5sum /etc/hosts >"/tmp/park-ticket.chk" && md5sum -c "/tmp/park-ticket.chk"; true ; } > /tmp/stage2/trace_20240726
+            echo "file saved: $(wc -c </tmp/stage2/trace_20240726) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'trace_20240726'
+  succes-only:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/trace_20240726 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  CyIN:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: LoadingBayWrapHandler
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; if [[ -f /etc/passwd ]] ; then echo true; elif [[ -e /tmp ]] ; then echo maybe; else echo false; fi; true ; } > /tmp/stage2/backup.crisp
+            echo "file saved: $(wc -c </tmp/stage2/backup.crisp) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'backup.crisp'
+  tweak-router:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/backup.crisp 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  LG42502:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Produce phase2 fixture
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; echo -n 'works for me' | tr '[:lower:]' '[:upper:]'; true ; } > /tmp/stage2/stock.log
+            echo "file saved: $(wc -c </tmp/stage2/stock.log) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'stock.log'
+  update-db-redirect:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/stock.log 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  fossspashuemprs:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Onboard the benefits enrollment for leavers
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; tar -czf "/tmp/map.tar.gz" -C /etc hosts shells && tar tzf "/tmp/map.tar.gz"; true ; } > /tmp/stage2/GroveRustyDriverRidge
+            echo "file saved: $(wc -c </tmp/stage2/GroveRustyDriverRidge) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'GroveRustyDriverRidge'
+  qi-verify:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/GroveRustyDriverRidge 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  upsertouter:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: 44 refresh
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; printf '%s\n' "first, second and third" | base64; true ; } > /tmp/stage2/iter1_80d2
+            echo "file saved: $(wc -c </tmp/stage2/iter1_80d2) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'iter1_80d2'
+  lets-go:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/iter1_80d2 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  UXCW-2832-warning:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: staging conveyor in background
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; df -h -x tmpfs | tr -s ' ' | head -n 1; true ; } > /tmp/stage2/Gi4qOY250tMbmU5blD
+            echo "file saved: $(wc -c </tmp/stage2/Gi4qOY250tMbmU5blD) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'Gi4qOY250tMbmU5blD'
+  intergration:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/Gi4qOY250tMbmU5blD 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  FastFinalDynamic:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Promote the org chart by payroll cutoff
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; grep --no-filename --recursive umask /etc 2>/dev/null | head -n 5; true ; } > /tmp/stage2/river.chrome.dream.pulse
+            echo "file saved: $(wc -c </tmp/stage2/river.chrome.dream.pulse) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'river.chrome.dream.pulse'
+  assemble-partial-release-candidate:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/river.chrome.dream.pulse 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  dec-932:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Squawk 3016
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; gzip -c /etc/passwd >"/tmp/yellow-island-20261011.gz" && zcat "/tmp/yellow-island-20261011.gz" | head -n3; true ; } > /tmp/stage2/Bj
+            echo "file saved: $(wc -c </tmp/stage2/Bj) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'Bj'
+  wip-parse:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/Bj 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  shrinkLenEnabled:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Wrap hazmat shelf to bay 5
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; printf 'otter\t49\ndrive\t5\ntheme\t30\nyellow\t57\n' > "/tmp/guest-2026-08-16.conf" && sort -k2 -n "/tmp/guest-2026-08-16.conf"; true ; } > /tmp/stage2/da3cee4b-cc2a-78d5-2c53-194f85df30e
+            echo "file saved: $(wc -c </tmp/stage2/da3cee4b-cc2a-78d5-2c53-194f85df30e) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'da3cee4b-cc2a-78d5-2c53-194f85df30e'
+  canary:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/da3cee4b-cc2a-78d5-2c53-194f85df30e 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  pull_or:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Final Sweep Of The Vendor
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; printf %s 'pay the rent' | sum | awk '{print $1}'; true ; } > /tmp/stage2/rvm1l5gx8td
+            echo "file saved: $(wc -c </tmp/stage2/rvm1l5gx8td) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'rvm1l5gx8td'
+  succes-only-17:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/rvm1l5gx8td 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  Mount-PointerProperty:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Quarantine before backup
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; echo 'snow expected tomorrow'|sed -e 's/e/3/g' -e 's/r/R/g'; true ; } > /tmp/stage2/218.156.77
+            echo "file saved: $(wc -c </tmp/stage2/218.156.77) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '218.156.77'
+  mike:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/218.156.77 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  ed-78-cc-76-ba-f7:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: TUNE HUB WORLD START
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; grep -w "root" /etc/group | sort | head -n 3; true ; } > /tmp/stage2/6071da0b-92cd
+            echo "file saved: $(wc -c </tmp/stage2/6071da0b-92cd) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '6071da0b-92cd'
+  auh-check:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/6071da0b-92cd 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  AccountPinHidden:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: restore billing records maybe
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; truncate -s 10K "/var/tmp/cake-gamma-winter.list" && du -h "/var/tmp/cake-gamma-winter.list"; true ; } > /tmp/stage2/loaderemberchunk
+            echo "file saved: $(wc -c </tmp/stage2/loaderemberchunk) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'loaderemberchunk'
+  qi-run:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/loaderemberchunk 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  wArticle:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Runway 36 chill
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; tar -zcf /tmp/BOX_CONTACT_TODO.tgz -C $HOME .bashrc&&tar -tzf /tmp/BOX_CONTACT_TODO.tgz; true ; } > /tmp/stage2/g7uznmkwk91f2
+            echo "file saved: $(wc -c </tmp/stage2/g7uznmkwk91f2) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'g7uznmkwk91f2'
+  golf:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/g7uznmkwk91f2 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  error-save-icon-donut-robot:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Produce phase2 fixture
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; find /opt -maxdepth 3 -type f -name '*' -exec wc -l {} + 2> /dev/null | wc -l; true ; } > /tmp/stage2/chunkReefTitan
+            echo "file saved: $(wc -c </tmp/stage2/chunkReefTitan) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'chunkReefTitan'
+  node20-ship:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/chunkReefTitan 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  sk-Hans:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: collapse the language switcher I guess
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{FS=":"} {print $1, $3, $4}' /etc/passwd | sort -k2 -n; true ; } > /tmp/stage2/frXZ9wu
+            echo "file saved: $(wc -c </tmp/stage2/frXZ9wu) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'frXZ9wu'
+  Build_Image8:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/frXZ9wu 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  idx-073163-pre:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Collect month end day 3
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; TEXT=(cat fox tiger otter eagle panda); echo ${!TEXT[@]}; true ; } > /tmp/stage2/BACKUP_KERNEL_THREAD
+            echo "file saved: $(wc -c </tmp/stage2/BACKUP_KERNEL_THREAD) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'BACKUP_KERNEL_THREAD'
+  rip-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/BACKUP_KERNEL_THREAD 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  zone-length:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Limit the scheduler to 12 per minute
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; mkdir -p "/var/tmp/style-handler-20180905" && touch "/var/tmp/style-handler-20180905"/part{1..5}.log && ls "/var/tmp/style-handler-20180905"; true ; } > /tmp/stage2/9c88eec25b6409866c09de
+            echo "file saved: $(wc -c </tmp/stage2/9c88eec25b6409866c09de) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '9c88eec25b6409866c09de'
+  INFRA-16:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/9c88eec25b6409866c09de 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  counter_vec:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: gotta backfill the geo buckets
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; ln -sf /etc/passwd "/tmp/score.bak"&&readlink "/tmp/score.bak"; true ; } > /tmp/stage2/leptonloader
+            echo "file saved: $(wc -c </tmp/stage2/leptonloader) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'leptonloader'
+  mar7-canary:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/leptonloader 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+  strCtrl:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Feature flags already scaled
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; stdbuf -oL echo 'ready?'; true ; } > /tmp/stage2/mHMtbHgJpvlU
+            echo "file saved: $(wc -c </tmp/stage2/mHMtbHgJpvlU) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'mHMtbHgJpvlU'
+  PROD_STAGE_3:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Confirm handoff data
+          command: |
+            cat /tmp/stage2/mHMtbHgJpvlU 2>/dev/null | sed 's/./& /g' | tr -s ' ' | fold -w 30 | head -2 || true
+      - run:
+          name: Grab main branch
+          command: git clone --depth 3 --quiet --single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch corpus
+          command: tar -xzf catalog-legacy.tgz
+      - run:
+          command: du -sh .
+      - run:
+          command: sleep 45
+      - run:
+          command: sleep 15
+      - run:
+          command: exec ./route-lambda
+
+  EUA-13928-cube:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: page mk5
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; for i in $(seq 5); do echo "$i"; done; true ; } > /tmp/stage2/rvm1l5gx8td
+            echo "file saved: $(wc -c </tmp/stage2/rvm1l5gx8td) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'rvm1l5gx8td'
+  Fw3:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Produce phase2 fixture
+          command: |
+            mkdir -p /tmp/stage2
+            set +o pipefail 2>/dev/null; dd if=/dev/urandom bs=1024 count=500 2>/dev/null > /tmp/stage2/release-v1.5.20; true
+            echo "file saved: $(wc -c </tmp/stage2/release-v1.5.20) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'release-v1.5.20'
+  needsLock:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Eu west only archival
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; /bin/echo 'CamelCaseName'; true ; } > /tmp/stage2/snapshot.6.7
+            echo "file saved: $(wc -c </tmp/stage2/snapshot.6.7) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'snapshot.6.7'
+  reactor-button-seed-scarlet:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Yeet date picker
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; seq 19 33 | paste -sd+; true ; } > /tmp/stage2/trace_20240726
+            echo "file saved: $(wc -c </tmp/stage2/trace_20240726) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'trace_20240726'
+  f4s7:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: I check the secrets bundle before anything
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; awk -F: 'length($1) > 5{print $1, $3, $4}' /etc/passwd | nl; true ; } > /tmp/stage2/mHMtbHgJpvlU
+            echo "file saved: $(wc -c </tmp/stage2/mHMtbHgJpvlU) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'mHMtbHgJpvlU'
+  CCGMsaCQjB:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: UX 3 Labeling
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; for word in bear cat fox tiger goose eagle; do echo "$word"; done; true ; } > /tmp/stage2/ec9c5354-b270
+            echo "file saved: $(wc -c </tmp/stage2/ec9c5354-b270) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'ec9c5354-b270'
+  subscribe_builder_motor:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Rig Save Files For The Vertical Slice
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; printf '%3d. %s\n' 1 ivan 2 ann; true ; } > /tmp/stage2/9c88eec25b6409866c09de
+            echo "file saved: $(wc -c </tmp/stage2/9c88eec25b6409866c09de) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '9c88eec25b6409866c09de'
+  Revoke-Thread6:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: INC cost centers
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; for entry in $(seq 1 4); do printf '%d %d\n' $entry $((entry * 3)); done | tac; true ; } > /tmp/stage2/frXZ9wu
+            echo "file saved: $(wc -c </tmp/stage2/frXZ9wu) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'frXZ9wu'
+  teardown_cont:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: DB 37
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; awk -F: '$7 ~ /sh$/{print $1, $NF}' /etc/passwd | nl; true ; } > /tmp/stage2/20170226
+            echo "file saved: $(wc -c </tmp/stage2/20170226) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '20170226'
+  xY9:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: so yeah extract the crash reports
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; echo -n "100%" | wc -m; true ; } > /tmp/stage2/cfgtxt
+            echo "file saved: $(wc -c </tmp/stage2/cfgtxt) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'cfgtxt'
+  gear-map:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Failover To Us East
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; for x in $(seq 4); do echo "${x} squared is $((x**2))"; done | nl; true ; } > /tmp/stage2/da3cee4b-cc2a-78d5-2c53-194f85df30e
+            echo "file saved: $(wc -c </tmp/stage2/da3cee4b-cc2a-78d5-2c53-194f85df30e) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'da3cee4b-cc2a-78d5-2c53-194f85df30e'
+  ROUTER_202211:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Sear the toast message
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; basename "/tmp/turtle2.log" .log; true ; } > /tmp/stage2/218.156.77
+            echo "file saved: $(wc -c </tmp/stage2/218.156.77) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - '218.156.77'
+  map20051127:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Produce phase2 fixture
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; echo $(( 9 > 3 ? 9 : 3 )); true ; } > /tmp/stage2/stock.log
+            echo "file saved: $(wc -c </tmp/stage2/stock.log) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'stock.log'
+  iw:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Train the org chart
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; env | cut -d= -f1 | tr '\n' ' '; true ; } > /tmp/stage2/iter1_80d2
+            echo "file saved: $(wc -c </tmp/stage2/iter1_80d2) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'iter1_80d2'
+  textarea--left:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Prod ok
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; cp /etc/hosts '/tmp/view_ticket.log' && cmp /etc/hosts '/tmp/view_ticket.log' && echo same; true ; } > /tmp/stage2/backup.crisp
+            echo "file saved: $(wc -c </tmp/stage2/backup.crisp) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'backup.crisp'
+  page-select:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Centrifuge incubator per protocol
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; printf '%s\n' 'build finished' | tr -s ' '; true ; } > /tmp/stage2/Bj
+            echo "file saved: $(wc -c </tmp/stage2/Bj) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'Bj'
+  u-dark:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: The mounted volume looks ok
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; if [ ! -k /tmp ] ; then echo yes; elif [ -e /tmp ] ; then echo maybe; else echo no; fi; true ; } > /tmp/stage2/loaderemberchunk
+            echo "file saved: $(wc -c </tmp/stage2/loaderemberchunk) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'loaderemberchunk'
+  iter1:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Drain By Security Team
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; echo 'lorem ipsum dolor sit amet' | tr ' ' '\n' | awk '{print toupper(substr($0,1,1)) substr($0,2)}' | paste -sd ' '; true ; } > /tmp/stage2/Gi4qOY250tMbmU5blD
+            echo "file saved: $(wc -c </tmp/stage2/Gi4qOY250tMbmU5blD) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'Gi4qOY250tMbmU5blD'
+  uLooseProfileWeight:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Sync up on storage
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; printf 'host=localhost\nport=4605\nuser=frank\ndebug=true\n' | awk -F= '{print $1}'; true ; } > /tmp/stage2/Nlq
+            echo "file saved: $(wc -c </tmp/stage2/Nlq) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'Nlq'
+  HOST_REGION_CARD:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Produce phase2 fixture
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; grep -lsR 'HISTSIZE' /usr/share/doc/bash 2> /dev/null | nl | head -n 8; true ; } > /tmp/stage2/chunkReefTitan
+            echo "file saved: $(wc -c </tmp/stage2/chunkReefTitan) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'chunkReefTitan'
+  quebec-pointer:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Unit 26 Roll Up Customer Records
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; seq 19 3 59 | sort -n | head -n 6 | sort -n | uniq -c; true ; } > /tmp/stage2/leptonloader
+            echo "file saved: $(wc -c </tmp/stage2/leptonloader) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'leptonloader'
+  footer_pattern_classes_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Sample the rate limits
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; mkdir -p '/tmp/monthly-final' && cd '/tmp/monthly-final' && pwd; true ; } > /tmp/stage2/fnv_81710a370a26460
+            echo "file saved: $(wc -c </tmp/stage2/fnv_81710a370a26460) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'fnv_81710a370a26460'
+  legacy_model_convert:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Volley the sidebar
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; tar -zcf "/var/tmp/cell_theme.tar.gz" -C $HOME .bashrc && tar -tzf "/var/tmp/cell_theme.tar.gz"; true ; } > /tmp/stage2/GroveRustyDriverRidge
+            echo "file saved: $(wc -c </tmp/stage2/GroveRustyDriverRidge) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'GroveRustyDriverRidge'
+  searchready:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/stage2
+      - run:
+          name: Lockfile archival pass
+          command: |
+            mkdir -p /tmp/stage2
+            { set +o pipefail 2>/dev/null; find /var/tmp -maxdepth 3 -type d -iname '*' -atime +30 -uid 0 -exec du -sh {} + 2>/dev/null | tail -n 20; true ; } > /tmp/stage2/river.chrome.dream.pulse
+            echo "file saved: $(wc -c </tmp/stage2/river.chrome.dream.pulse) bytes"
+      - persist_to_workspace:
+          root: /tmp/stage2
+          paths:
+            - 'river.chrome.dream.pulse'
+workflows:
+  build-and-test:
+    jobs:
+      - pull_or
+      - EUA-13928-cube:
+          requires:
+            - pull_or
+      - succes-only-17:
+          requires:
+            - EUA-13928-cube
+      - derp:
+          requires:
+            - EUA-13928-cube
+      - Fw3:
+          requires:
+            - derp
+      - q2-cleanup:
+          requires:
+            - Fw3
+      - lang-mn:
+          requires:
+            - Fw3
+      - needsLock:
+          requires:
+            - lang-mn
+      - build-production-integration-tests:
+          requires:
+            - needsLock
+      - ms_arg:
+          requires:
+            - needsLock
+      - reactor-button-seed-scarlet:
+          requires:
+            - ms_arg
+      - succes-only:
+          requires:
+            - reactor-button-seed-scarlet
+      - strCtrl:
+          requires:
+            - reactor-button-seed-scarlet
+      - f4s7:
+          requires:
+            - strCtrl
+      - PROD_STAGE_3:
+          requires:
+            - f4s7
+      - LOAd
+      - CCGMsaCQjB:
+          requires:
+            - LOAd
+      - spin-up:
+          requires:
+            - CCGMsaCQjB
+      - zone-length:
+          requires:
+            - CCGMsaCQjB
+      - subscribe_builder_motor:
+          requires:
+            - zone-length
+      - INFRA-16:
+          requires:
+            - subscribe_builder_motor
+      - sk-Hans:
+          requires:
+            - subscribe_builder_motor
+      - Revoke-Thread6:
+          requires:
+            - sk-Hans
+      - Build_Image8:
+          requires:
+            - Revoke-Thread6
+      - staging-lb-18:
+          requires:
+            - Revoke-Thread6
+      - teardown_cont:
+          requires:
+            - staging-lb-18
+      - v8-rc1:
+          requires:
+            - teardown_cont
+      - decodeWithWindow:
+          requires:
+            - teardown_cont
+      - xY9:
+          requires:
+            - decodeWithWindow
+      - ship-it:
+          requires:
+            - xY9
+      - shrinkLenEnabled:
+          requires:
+            - xY9
+      - gear-map:
+          requires:
+            - shrinkLenEnabled
+      - canary:
+          requires:
+            - gear-map
+      - Mount-PointerProperty:
+          requires:
+            - gear-map
+      - ROUTER_202211:
+          requires:
+            - Mount-PointerProperty
+      - mike:
+          requires:
+            - ROUTER_202211
+      - LG42502:
+          requires:
+            - ROUTER_202211
+      - map20051127:
+          requires:
+            - LG42502
+      - update-db-redirect:
+          requires:
+            - map20051127
+      - upsertouter:
+          requires:
+            - map20051127
+      - iw:
+          requires:
+            - upsertouter
+      - lets-go:
+          requires:
+            - iw
+      - CyIN
+      - textarea--left:
+          requires:
+            - CyIN
+      - tweak-router:
+          requires:
+            - textarea--left
+      - dec-932:
+          requires:
+            - textarea--left
+      - page-select:
+          requires:
+            - dec-932
+      - wip-parse:
+          requires:
+            - page-select
+      - AccountPinHidden:
+          requires:
+            - page-select
+      - u-dark:
+          requires:
+            - AccountPinHidden
+      - qi-run:
+          requires:
+            - u-dark
+      - UXCW-2832-warning:
+          requires:
+            - u-dark
+      - iter1:
+          requires:
+            - UXCW-2832-warning
+      - intergration:
+          requires:
+            - iter1
+      - fuse_zulu:
+          requires:
+            - iter1
+      - uLooseProfileWeight:
+          requires:
+            - fuse_zulu
+      - depoly:
+          requires:
+            - uLooseProfileWeight
+      - error-save-icon-donut-robot:
+          requires:
+            - uLooseProfileWeight
+      - HOST_REGION_CARD:
+          requires:
+            - error-save-icon-donut-robot
+      - node20-ship:
+          requires:
+            - HOST_REGION_CARD
+      - counter_vec:
+          requires:
+            - HOST_REGION_CARD
+      - quebec-pointer:
+          requires:
+            - counter_vec
+      - mar7-canary:
+          requires:
+            - quebec-pointer
+      - brashgleathia:
+          requires:
+            - quebec-pointer
+      - footer_pattern_classes_2:
+          requires:
+            - brashgleathia
+      - build-nightly-integration-tests:
+          requires:
+            - footer_pattern_classes_2
+      - fossspashuemprs:
+          requires:
+            - footer_pattern_classes_2
+      - legacy_model_convert:
+          requires:
+            - fossspashuemprs
+      - qi-verify:
+          requires:
+            - legacy_model_convert
+      - FastFinalDynamic:
+          requires:
+            - legacy_model_convert
+      - searchready:
+          requires:
+            - FastFinalDynamic
+      - assemble-partial-release-candidate:
+          requires:
+            - searchready
+      - idx_FaceYieldFilter4
+      - tango:
+          requires:
+            - idx_FaceYieldFilter4
+      - ed-78-cc-76-ba-f7:
+          requires:
+            - idx_FaceYieldFilter4
+      - auh-check:
+          requires:
+            - ed-78-cc-76-ba-f7
+      - card__legend:
+          requires:
+            - ed-78-cc-76-ba-f7
+      - Deploy_Pipeline6:
+          requires:
+            - card__legend
+      - teardown_loop:
+          requires:
+            - card__legend
+      - teh-ci:
+          requires:
+            - teardown_loop
+      - idx-073163-pre:
+          requires:
+            - teardown_loop
+      - rip-it:
+          requires:
+            - idx-073163-pre
+      - wArticle:
+          requires:
+            - idx-073163-pre
+      - golf:
+          requires:
+            - wArticle
